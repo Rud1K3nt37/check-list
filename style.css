@@ -1,0 +1,45 @@
+body {
+  font-family: Arial, sans-serif;
+  padding: 20px;
+  background: #f7f7f7;
+}
+
+table {
+  border-collapse: collapse;
+  width: 100%;
+  background: #fff;
+  border-collapse: collapse;
+}
+
+td, th {
+  border: 1px solid #ccc;
+  padding: 0;
+}
+
+th {
+  background: #eee;
+}
+
+td.status {
+  font-size: 20px;
+}
+
+td.status.✅ {
+  color: green;
+}
+
+td.status.❌ {
+  color: red;
+}
+
+td.status.⏳ {
+  color: orange;
+}
+
+input {
+  width: 100%;
+  height: 100%;
+  box-sizing: border-box;
+  padding: 5px;
+  text-align: center;
+}
