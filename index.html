@@ -1,41 +1,62 @@
 <!DOCTYPE html>
 <html lang="ru">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Чек-лист продуктов</title>
-    <link rel="stylesheet" href="./style.css">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Чек-лист продуктов</title>
+  <link rel="stylesheet" href="style.css">
 </head>
 <body>
 
-    <h1 class="title">Чек-лист продуктов и заготовок</h1>
+  <h1 class="title">Чек-лист продуктов и заготовок</h1>
 
-    <h2>Морозилка</h2>
-    <table class="checklist" data-category="freezer">
+  <h2>Морозилка</h2>
+  <table class="checklist" data-category="freezer">
     <thead>
         <tr>
+          <th>Заготовки</th>
+          <th>Мин. остаток</th>
+          <th>Кол-во</th>
+          <th>Комментарий</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
+  </table>
+
+  <h2>Холодильник</h2>
+  <table class="checklist" data-category="fridge">
+  <thead>
+      <tr>
         <th>Заготовки</th>
         <th>Мин. остаток</th>
         <th>Кол-во</th>
         <th>Комментарий</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-    </table>
+      </tr>
+  </thead>
+  <tbody></tbody>
+  </table>
 
-    <h2>Холодильник</h2>
-    <table class="checklist" data-category="fridge">
-    <thead>
-        <tr>
-        <th>Заготовки</th>
-        <th>Мин. остаток</th>
-        <th>Кол-во</th>
-        <th>Комментарий</th>
-        </tr>
-    </thead>
-    <tbody></tbody>
-    </table>
+  <script src="script.js"></script>
 
-    <script src="./script.js"></script>
+  <!-- Firebase App (обязательно) -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-app-compat.js"></script>
+  <!-- Firestore -->
+  <script src="https://www.gstatic.com/firebasejs/9.22.1/firebase-firestore-compat.js"></script>
+
+  <script>
+  const firebaseConfig = {
+      apiKey: "AIzaSyBlQNY2nMxLx9VRDxhyZgzLPjPmMK5o-ow",
+      authDomain: "checklist-9ea06.firebaseapp.com",
+      projectId: "checklist-9ea06",
+      storageBucket: "checklist-9ea06.firebasestorage.app",
+      messagingSenderId: "937820543130",
+      appId: "1:937820543130:web:1841393721bf8544b5a723",
+      measurementId: "G-N05DGX6BJM"
+  };
+
+  firebase.initializeApp(firebaseConfig);
+  const db = firebase.firestore();
+  </script>
+
 </body>
 </html>

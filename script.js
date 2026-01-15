@@ -1,14 +1,3 @@
-const STORAGE_KEY = "checklist_products";
-
-function loadProducts() {
-  const saved = localStorage.getItem(STORAGE_KEY);
-  return saved ? JSON.parse(saved) : products;
-}
-
-function saveProducts() {
-  localStorage.setItem(STORAGE_KEY, JSON.stringify(products));
-}
-
 const products = [
   // Морозилка
   { name: "Бульон Том-Ям", min: 10, count: 16, comment: "", category: "freezer" },
@@ -34,67 +23,84 @@ const products = [
   { name: "Маринад", min: 1, count: 5, comment: "", category: "fridge" },
 ];
 
-const savedProducts = loadProducts();
-
-savedProducts.forEach((saved, i) => {
-  if (products[i]) {
-    products[i].count = saved.count;
-    products[i].comment = saved.comment;
-  }
-});
-
 function getRowStatus(product) {
   if (product.count >= product.min) return "ok";
   if (product.count > 0) return "warn";
   return "bad";
 }
 
-document.querySelectorAll(".checklist").forEach(table => {
-  const category = table.dataset.category;
-  const tbody = table.querySelector("tbody");
+function renderTables() {
+  document.querySelectorAll(".checklist").forEach(table => {
+    const category = table.dataset.category;
+    const tbody = table.querySelector("tbody");
+    tbody.innerHTML = ""; // чистим старое содержимое
 
-  products
-    .filter(p => p.category === category)
-    .forEach((p) => {
-    const realIndex = products.indexOf(p);
+    products
+      .filter(p => p.category === category)
+      .forEach((p) => {
+        const realIndex = products.indexOf(p);
+        const tr = document.createElement("tr");
+        tr.className = getRowStatus(p);
 
-    const tr = document.createElement("tr");
-    tr.className = getRowStatus(p);
+        tr.innerHTML = `
+          <td>${p.name}</td>
+          <td>${p.min}</td>
+          <td>
+            <input type="number" value="${p.count}" min="0" data-index="${realIndex}">
+          </td>
+          <td>
+            <input type="text" value="${p.comment}" data-index="${realIndex}" class="comment">
+          </td>
+        `;
 
-    tr.innerHTML = `
-      <td>${p.name}</td>
-      <td>${p.min}</td>
-      <td>
-        <input type="number" value="${p.count}" min="0" data-index="${realIndex}">
-      </td>
-      <td>
-        <input type="text" value="${p.comment}" data-index="${realIndex}" class="comment">
-      </td>
-    `;
+        tbody.appendChild(tr);
+      });
+  });
+}
 
-      tbody.appendChild(tr);
-    });
+// после инициализации Firebase и Firestore
+const db = firebase.firestore();
+const productsCollection = db.collection("products");
+
+// 1️⃣ Загрузка продуктов из Firestore
+productsCollection.onSnapshot(snapshot => {
+  snapshot.forEach(doc => {
+    const data = doc.data();
+    const product = products.find(p => p.name === data.name);
+    if (product) {
+      product.count = data.count;
+      product.comment = data.comment;
+    }
+  });
+
+  renderTables(); // перестраиваем таблицы с актуальными данными
 });
 
+// 2️⃣ Обработчик изменений
 document.querySelectorAll(".checklist tbody").forEach(tbody => {
   tbody.addEventListener("input", e => {
     const idx = e.target.dataset.index;
     if (idx === undefined) return;
 
+    const product = products[idx];
+
     if (e.target.type === "number") {
-      products[idx].count = Number(e.target.value);
-      const tr = e.target.closest("tr");
-
-      tr.classList.remove("ok", "warn", "bad");
-      tr.classList.add(getRowStatus(products[idx]));
-
-      saveProducts();
+      product.count = Number(e.target.value);
     }
-
     if (e.target.classList.contains("comment")) {
-      products[idx].comment = e.target.value;
-
-      saveProducts();
+      product.comment = e.target.value;
     }
+
+    const tr = e.target.closest("tr");
+    tr.classList.remove("ok", "warn", "bad");
+    tr.classList.add(getRowStatus(product));
+
+    // 3️⃣ Сохраняем изменения в Firestore
+    productsCollection.doc(product.name).set({
+      name: product.name,
+      count: product.count,
+      comment: product.comment,
+      category: product.category
+    });
   });
 });
