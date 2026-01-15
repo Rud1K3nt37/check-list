@@ -8,20 +8,32 @@
 </head>
 <body>
 
-    <h2>Чек-лист продуктов и заготовок</h2>
-    <table id="checklist">
+    <h1 class="title">Чек-лист продуктов и заготовок</h1>
+
+    <h2>Морозилка</h2>
+    <table class="checklist" data-category="freezer">
     <thead>
         <tr>
         <th>Заготовки</th>
         <th>Мин. остаток</th>
         <th>Кол-во</th>
-        <th>Статус</th>
         <th>Комментарий</th>
         </tr>
     </thead>
-    <tbody>
-        <!-- Строки будут добавлены скриптом -->
-    </tbody>
+    <tbody></tbody>
+    </table>
+
+    <h2>Холодильник</h2>
+    <table class="checklist" data-category="fridge">
+    <thead>
+        <tr>
+        <th>Заготовки</th>
+        <th>Мин. остаток</th>
+        <th>Кол-во</th>
+        <th>Комментарий</th>
+        </tr>
+    </thead>
+    <tbody></tbody>
     </table>
 
     <script src="./script.js"></script>
