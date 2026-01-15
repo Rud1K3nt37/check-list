@@ -59,7 +59,6 @@ function renderTables() {
 }
 
 // после инициализации Firebase и Firestore
-const db = firebase.firestore();
 const productsCollection = db.collection("products");
 
 // 1️⃣ Загрузка продуктов из Firestore
