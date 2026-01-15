@@ -1,6 +1,6 @@
 const products = [
   // Морозилка
-  { name: "Бульон Том Ям", min: 10, count: 16, comment: "", category: "freezer" },
+  { name: "Бульон Том Ям", min: 10, count: 0, comment: "", category: "freezer" },
   // { name: "Бульон Рамен/Сырный", min: 10, count: 15, comment: "", category: "freezer" },
   // { name: "Креветки темпура", min: 5, count: 9, comment: "", category: "freezer" },
   // { name: "Овощи на рамен/сырный", min: 10, count: 12, comment: "", category: "freezer" },
@@ -61,25 +61,52 @@ function renderTables() {
 // после инициализации Firebase и Firestore
 const productsCollection = db.collection("products");
 
-// 1️⃣ Загрузка продуктов из Firestore
 productsCollection.onSnapshot(snapshot => {
   snapshot.forEach(doc => {
     const data = doc.data();
-    const product = products.find(p => p.name === data.name);
-    if (product) {
-      product.count = data.count;
-      product.comment = data.comment;
+
+    let product = products.find(p => p.name === doc.id);
+
+    // если продукта ещё нет — создаём
+    if (!product) {
+      products.push({
+        name: doc.id,
+        min: data.min ?? 0,
+        category: data.category,
+        count: data.count ?? 0,
+        comment: data.comment ?? ""
+      });
+    } else {
+      product.count = data.count ?? 0;
+      product.comment = data.comment ?? "";
     }
   });
 
-  renderTables(); // перестраиваем таблицы с актуальными данными
+  renderTables();
 });
+
+// 1️⃣ Загрузка продуктов из Firestore
+// productsCollection.onSnapshot(snapshot => {
+//   snapshot.forEach(doc => {
+//     const data = doc.data();
+//     const product = products.find(p => p.name === data.name);
+//     if (product) {
+//       product.count = data.count;
+//       product.comment = data.comment;
+//     }
+//   });
+
+//   renderTables(); // перестраиваем таблицы с актуальными данными
+// });
 
 // 2️⃣ Обработчик изменений
 document.querySelectorAll(".checklist tbody").forEach(tbody => {
-  tbody.addEventListener("input", e => {
-    const idx = e.target.dataset.index;
-    if (idx === undefined) return;
+  tbody.addEventListener("change", e => {
+    // const idx = e.target.dataset.index;
+    // if (idx === undefined) return;
+    const idx = Number(e.target.dataset.index);
+    if (Number.isNaN(idx)) return;
+
 
     const product = products[idx];
 
@@ -95,11 +122,15 @@ document.querySelectorAll(".checklist tbody").forEach(tbody => {
     tr.classList.add(getRowStatus(product));
 
     // 3️⃣ Сохраняем изменения в Firestore
-    productsCollection.doc(product.name).set({
-      name: product.name,
+    // productsCollection.doc(product.name).set({
+    //   name: product.name,
+    //   count: product.count,
+    //   comment: product.comment,
+    //   category: product.category
+    // });
+    productsCollection.doc(product.name).update({
       count: product.count,
-      comment: product.comment,
-      category: product.category
+      comment: product.comment
     });
   });
 });
